@@ -27,13 +27,13 @@ jobs:
 
       - name: Create Docker Authentication file
         uses: docker://golang:1.20
-        run: echo {"auths":{"hub.docker.com":{"username":"$DOCKERHUB_USER","password":"$DOCKERHUB_TOKEN","auth":"$(echo $DOCKERHUB_USER:$DOCKERHUB_TOKEN|base64)"}}} >> ${HOME}/.docker/config.json
+        run: echo {"auths":{"hub.docker.com":{"username":"${{ vars.DOCKERHUB_USER }}","password":"${{ secrets.DOCKERHUB_TOKEN }}","auth":"$(echo ${{ vars.DOCKERHUB_USER }}:${{ secrets.DOCKERHUB_TOKEN }}|base64)"}}} >> ${HOME}/.docker/config.json
 
       - name: Build and push container
         uses: cloudbees-io/kaniko@v1
         with:
           dockerfile: Dockerfile
           context: .
-          destination: ${{ secrets.DOCKERHUB_USER }}/${{ env.APP_NAME }}:${{ github.sha }}
+          destination: ${{ vars.DOCKERHUB_USER }}/${{ env.APP_NAME }}:${{ github.sha }}
           build-args: 
           labels: maintainer=Greg Maxey,version=github.sha
