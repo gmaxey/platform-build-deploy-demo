@@ -28,7 +28,7 @@ jobs:
         
       - name: Run build
         uses: docker://golang:1.20
-        run: go build -v
+        run: go build -v -buildvcs=false
 
       - name: Configure container registry credentials
         id: dockerconfig
