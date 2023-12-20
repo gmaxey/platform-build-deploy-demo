@@ -43,5 +43,4 @@ jobs:
           dockerfile: Dockerfile
           context: .
           destination: ${{ secrets.DOCKERHUB_USER }}/${{ env.APP_NAME }}:${{ cloudbees.scm.sha }}
-          build-args: ""
           labels: maintainer=Greg Maxey,version=${{ cloudbees.scm.sha }}
