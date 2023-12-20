@@ -17,6 +17,7 @@ jobs:
         uses: docker://alpine/git:latest
         run: |
           mkdir /app
+          git add /app
           git config --global --add safe.directory '*'
 
       - name: Install dependencies
