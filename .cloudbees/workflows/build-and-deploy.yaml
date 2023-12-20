@@ -12,6 +12,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: cloudbees-io/checkout@v1
+        
+      - name: Handle safe directory errors
+        uses: docker://golang:1.20
+        run: git config --global --add safe.directory '*'
 
       - name: Install dependencies
         uses: docker://golang:1.20
