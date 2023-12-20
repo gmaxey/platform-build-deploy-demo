@@ -25,15 +25,19 @@ jobs:
         uses: docker://golang:1.20
         run: go build -v
 
-      - name: Create Docker Authentication file
-        uses: docker://golang:1.20
-        run: echo {"auths":{"hub.docker.com":{"username":"${{ vars.DOCKERHUB_USER }}","password":"${{ secrets.DOCKERHUB_TOKEN }}","auth":"$(echo ${{ vars.DOCKERHUB_USER }}:${{ secrets.DOCKERHUB_TOKEN }}|base64)"}}} >> ${HOME}/.docker/config.json
-
+      - name: Configure container registry credentials
+        id: dockerconfig
+        uses: cloudbees-io/configure-oci-credentials@v1
+        with:
+          registry: ${{ vars.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
       - name: Build and push container
         uses: cloudbees-io/kaniko@v1
         with:
           dockerfile: Dockerfile
           context: .
-          destination: ${{ vars.DOCKERHUB_USER }}/${{ env.APP_NAME }}:${{ cloudbees.scm.sha }}
-          build-args: 
+          destination: ${{ secrets.DOCKERHUB_USER }}/${{ env.APP_NAME }}:${{ cloudbees.scm.sha }}
+          build-args: ""
           labels: maintainer=Greg Maxey,version=${{ cloudbees.scm.sha }}
