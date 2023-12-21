@@ -14,27 +14,26 @@ jobs:
     steps:
       - name: Checkout code
         uses: cloudbees-io/checkout@v1
-
       - name: Handle safe directory errors
         uses: docker://alpine/git:latest
         run: |
           git config --global --add safe.directory '*'
-        if: env.BUILD
+        if: env.BUILD == 'true'
 
       - name: Install dependencies
         uses: docker://golang:1.20
         run: go mod download
-        if: env.BUILD
+        if: env.BUILD == 'true'
 
       - name: Run tests
         uses: docker://golang:1.20
         run: go test -v ./...
-        if: env.BUILD
-        
+        if: env.BUILD == 'true'
+
       - name: Run build
         uses: docker://golang:1.20
         run: go build -v -buildvcs=false
-        if: env.BUILD
+        if: env.BUILD == 'true'
 
       - name: Configure container registry credentials
         id: dockerconfig
@@ -43,19 +42,20 @@ jobs:
           registry: ${{ vars.DOCKER_REGISTRY }}
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-        if: env.BUILD
-      
+        if: env.BUILD == 'true'
+
       - name: Build and push container
         uses: cloudbees-io/kaniko@v1
         with:
           dockerfile: Dockerfile
           context: .
-          destination: ${{ secrets.DOCKERHUB_USER }}/${{ env.APP_NAME }}:${{ cloudbees.scm.sha }}
+          destination: ${{ secrets.DOCKERHUB_USER }}/${{ env.APP_NAME }}:${{
+            cloudbees.scm.sha }}
           labels: maintainer=Greg Maxey,version=${{ cloudbees.scm.sha }}
-        if: env.BUILD
+        if: env.BUILD == 'true'
 
       - name: Add kubectl config file
         uses: docker://alpine:latest
         run: |
           echo Testing
-        if: env.DEPLOY
+        if: env.DEPLOY == 'true'
