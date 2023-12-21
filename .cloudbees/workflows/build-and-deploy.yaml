@@ -7,8 +7,8 @@ on:
       - "**"
 env:
   APP_NAME: demo-app
-  BUILD: false
-  DEPLOY: true
+  BUILD: 'false'
+  DEPLOY: 'true'
 jobs:
   build:
     steps:
@@ -65,6 +65,8 @@ jobs:
               server: ${{secrets.CLUSTER_SERVER}}
             name: gke_cb-thunder-v2_us-central1-a_gregs-k8s-cluster
           EOF
+        if: env.DEPLOY == 'true'
 
       - run: kubectl get namespaces
         uses: docker://bitnami/kubectl:latest
+        if: env.DEPLOY == 'true'
