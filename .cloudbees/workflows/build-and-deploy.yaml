@@ -24,17 +24,17 @@ jobs:
       - name: Install dependencies
         uses: docker://golang:1.20
         run: go mod download
-        if: env.BUILD == 'true'
+        if: ${{env.BUILD}}
 
       - name: Run tests
         uses: docker://golang:1.20
         run: go test -v ./...
-        if: env.BUILD == 'true'
+        if: ${{env.BUILD}}
 
       - name: Run build
         uses: docker://golang:1.20
         run: go build -v -buildvcs=false
-        if: env.BUILD == 'true'
+        if: ${{env.BUILD}}
 
       - name: Configure container registry credentials
         id: dockerconfig
@@ -43,7 +43,7 @@ jobs:
           registry: ${{ vars.DOCKER_REGISTRY }}
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-        if: env.BUILD == 'true'
+        if: ${{env.BUILD}}
 
       - name: Build and push container
         uses: cloudbees-io/kaniko@v1
@@ -53,7 +53,7 @@ jobs:
           destination: ${{ secrets.DOCKERHUB_USER }}/${{ env.APP_NAME }}:${{
             cloudbees.scm.sha }}
           labels: maintainer=Greg Maxey,version=${{ cloudbees.scm.sha }}
-        if: env.BUILD == 'true'
+        if: ${{env.BUILD}}
 
       - name: Add kubectl config file
         uses: docker://alpine:latest
@@ -66,8 +66,8 @@ jobs:
               server: ${{secrets.CLUSTER_SERVER}}
             name: gke_cb-thunder-v2_us-central1-a_gregs-k8s-cluster
           EOF
-        if: ${{ env.DEPLOY }}
+        if: ${{env.DEPLOY}}
 
       - run: kubectl get namespaces
         uses: docker://bitnami/kubectl:latest
-        if: env.DEPLOY == 'true'
+        if: ${{env.DEPLOY}}
