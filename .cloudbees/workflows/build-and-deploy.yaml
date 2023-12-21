@@ -66,7 +66,7 @@ jobs:
               server: ${{secrets.CLUSTER_SERVER}}
             name: gke_cb-thunder-v2_us-central1-a_gregs-k8s-cluster
           EOF
-        if: env.DEPLOY
+        if: ${{ env.DEPLOY }}
 
       - run: kubectl get namespaces
         uses: docker://bitnami/kubectl:latest
