@@ -67,4 +67,4 @@ jobs:
           EOF
 
       - run: kubectl get namespaces
-        uses: bitnami/kubectl@latest
+        uses: docker://bitnami/kubectl:latest
