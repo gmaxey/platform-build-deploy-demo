@@ -61,8 +61,8 @@ jobs:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority-data: ${{CLUSTER_CERT}}
-              server: ${{CLUSERT_SERVER}}
+              certificate-authority-data: ${{secrets.CLUSTER_CERT}}
+              server: ${{secrets.CLUSERT_SERVER}}
             name: gke_cb-thunder-v2_us-central1-a_gregs-k8s-cluster
           EOF
 
