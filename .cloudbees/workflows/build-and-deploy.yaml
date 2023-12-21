@@ -7,6 +7,7 @@ on:
       - "**"
 env:
   APP_NAME: demo-app
+  BUILD: true
 jobs:
   build:
     steps:
@@ -17,18 +18,22 @@ jobs:
         uses: docker://alpine/git:latest
         run: |
           git config --global --add safe.directory '*'
+        if: $BUILD
 
       - name: Install dependencies
         uses: docker://golang:1.20
         run: go mod download
+        if: $BUILD
 
       - name: Run tests
         uses: docker://golang:1.20
         run: go test -v ./...
+        if: $BUILD
         
       - name: Run build
         uses: docker://golang:1.20
         run: go build -v -buildvcs=false
+        if: $BUILD
 
       - name: Configure container registry credentials
         id: dockerconfig
@@ -37,6 +42,7 @@ jobs:
           registry: ${{ vars.DOCKER_REGISTRY }}
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+        if: $BUILD
       
       - name: Build and push container
         uses: cloudbees-io/kaniko@v1
@@ -45,3 +51,4 @@ jobs:
           context: .
           destination: ${{ secrets.DOCKERHUB_USER }}/${{ env.APP_NAME }}:${{ cloudbees.scm.sha }}
           labels: maintainer=Greg Maxey,version=${{ cloudbees.scm.sha }}
+        if: $BUILD
