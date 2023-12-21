@@ -67,4 +67,4 @@ jobs:
           EOF
 
       - run: kubectl get namespaces
-        uses: cloudbees-io/helm-install@v1
+        uses: bitnami/kubectl@latest
