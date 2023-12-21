@@ -18,7 +18,7 @@ jobs:
         uses: docker://alpine/git:latest
         run: |
           git config --global --add safe.directory '*'
-        if: env.BUILD == 'true'
+        if: env.BUILD
 
       - name: Install dependencies
         uses: docker://golang:1.20
@@ -65,7 +65,7 @@ jobs:
               server: ${{secrets.CLUSTER_SERVER}}
             name: gke_cb-thunder-v2_us-central1-a_gregs-k8s-cluster
           EOF
-        if: env.DEPLOY == 'true'
+        if: env.DEPLOY
 
       - run: kubectl get namespaces
         uses: docker://bitnami/kubectl:latest
