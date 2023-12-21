@@ -7,7 +7,7 @@ on:
       - "**"
 env:
   APP_NAME: demo-app
-  BUILD: true
+  BUILD: false
 jobs:
   build:
     steps:
@@ -52,3 +52,8 @@ jobs:
           destination: ${{ secrets.DOCKERHUB_USER }}/${{ env.APP_NAME }}:${{ cloudbees.scm.sha }}
           labels: maintainer=Greg Maxey,version=${{ cloudbees.scm.sha }}
         if: $BUILD
+
+      - name: Add kubectl config file
+        uses: docker://alpine:latest
+        run: |
+          echo Testing
