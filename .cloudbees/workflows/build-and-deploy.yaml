@@ -66,5 +66,5 @@ jobs:
             name: gke_cb-thunder-v2_us-central1-a_gregs-k8s-cluster
           EOF
 
-      - run: cat ${HOME}/.kube/config
-        uses: docker://alpine:latest
+      - run: kubectl get namespaces
+        uses: cloudbees-io/helm-install@v1
