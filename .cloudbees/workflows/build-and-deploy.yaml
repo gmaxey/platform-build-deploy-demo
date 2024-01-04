@@ -63,23 +63,23 @@ jobs:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority-data: ${secrets.CLUSTER_CERT}
-              server: ${secrets.CLUSTER_SERVER}
-            name: ${secrets.CLUSTER_NAME}
+              certificate-authority-data: ${{ secrets.CLUSTER_CERT }}
+              server: ${{ secrets.CLUSTER_SERVER }}
+            name: ${{ secrets.CLUSTER_NAME }}
           contexts:
           - context:
-              cluster: ${secrets.CLUSTER_NAME}
-              user: ${secrets.CLUSTER_NAME}
-            name: ${secrets.CLUSTER_NAME}
-          current-context: ${secrets.CLUSTER_NAME}
+              cluster: ${{ secrets.CLUSTER_NAME }}
+              user: ${{ secrets.CLUSTER_NAME }}
+            name: ${{ secrets.CLUSTER_NAME }}
+          current-context: ${{ secrets.CLUSTER_NAME }}
           kind: Config
           preferences: {}
           users:
-          - name: ${secrets.CLUSTER_NAME}
+          - name: ${{ secrets.CLUSTER_NAME }}
             user:
               auth-provider:
                 config:
-                  access-token: ${secrets.USER_ACCESS_TOKEN}
+                  access-token: ${{ secrets.USER_ACCESS_TOKEN }}
                   cmd-args: config config-helper --format=json
                   cmd-path: /usr/lib/google-cloud-sdk/bin/gcloud
                   expiry: "2024-01-04T19:09:59Z"
