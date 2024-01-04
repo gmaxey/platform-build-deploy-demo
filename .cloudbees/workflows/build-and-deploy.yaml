@@ -81,7 +81,7 @@ jobs:
                 config:
                   access-token: ${{ secrets.USER_ACCESS_TOKEN }}
                   cmd-args: config config-helper --format=json
-                  cmd-path: /usr/lib/google-cloud-sdk/bin/gcloud
+                  cmd-path: /google-cloud-sdk/bin/gcloud
                   expiry: "2024-01-04T19:09:59Z"
                   expiry-key: '{.credential.token_expiry}'
                   token-key: '{.credential.access_token}'
