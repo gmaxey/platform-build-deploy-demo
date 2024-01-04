@@ -58,16 +58,37 @@ jobs:
       - name: Add kubectl config file
         uses: docker://alpine:latest
         run: |
-          mkdir ${HOME}/.kube && cat > ${HOME}/.kube/config << EOF
+          rm -rf ${HOME}/.kube
+          mkdir ${HOME}/.kube && cat >> ${HOME}/.kube/config << EOF
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority-data: ${{secrets.CLUSTER_CERT}}
-              server: ${{secrets.CLUSTER_SERVER}}
-            name: gke_cb-thunder-v2_us-central1-a_gregs-k8s-cluster
+              certificate-authority-data: ${secrets.CLUSTER_CERT}
+              server: ${CLUSTER_SERVER}
+            name: ${secrets.CLUSTER_NAME}
+          contexts:
+          - context:
+              cluster: ${secrets.CLUSTER_NAME}
+              user: ${secrets.CLUSTER_NAME}
+            name: ${secrets.CLUSTER_NAME}
+          current-context: ${secrets.CLUSTER_NAME}
+          kind: Config
+          preferences: {}
+          users:
+          - name: ${secrets.CLUSTER_NAME}
+            user:
+              auth-provider:
+                config:
+                  access-token: ${secrets.USER_ACCESS_TOKEN}
+                  cmd-args: config config-helper --format=json
+                  cmd-path: /usr/lib/google-cloud-sdk/bin/gcloud
+                  expiry: "2024-01-04T19:09:59Z"
+                  expiry-key: '{.credential.token_expiry}'
+                  token-key: '{.credential.access_token}'
+                name: gcp
           EOF
         if: ${{env.DEPLOY}}
 
       - run: kubectl get namespaces
-        uses: docker://bitnami/kubectl:latest
+        uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         if: ${{env.DEPLOY}}
