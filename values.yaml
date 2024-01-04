@@ -3,7 +3,7 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: "true"
-  hostname: demo.gmaxeyk8s.cb-demos.io
+  hostname: demo.qa.gmaxeyk8s.cb-demos.io
 
 image:
   repository: gmaxey/demo-app
