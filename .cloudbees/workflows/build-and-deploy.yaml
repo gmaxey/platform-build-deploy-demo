@@ -64,7 +64,7 @@ jobs:
           clusters:
           - cluster:
               certificate-authority-data: ${secrets.CLUSTER_CERT}
-              server: ${CLUSTER_SERVER}
+              server: ${secrets.CLUSTER_SERVER}
             name: ${secrets.CLUSTER_NAME}
           contexts:
           - context:
