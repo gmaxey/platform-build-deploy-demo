@@ -89,10 +89,17 @@ jobs:
           EOF
         if: ${{env.DEPLOY}}
 
+      - run: kubectl get namespaces
+        name: test connection
+        uses: docker://kiwigrid/gcloud-kubectl-helm:latest
+        if: ${{env.DEPLOY}}
+
       - run: kubectl create namespace qa
+        name: Create target namespace
         uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         if: ${{env.DEPLOY}}
         
       - run: helm install demo-app ./chart -f values.yaml
+        name: Deploy helm chart
         uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         if: ${{env.DEPLOY}}
