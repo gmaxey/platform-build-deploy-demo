@@ -11,6 +11,7 @@ env:
   DEPLOY: "true"
 jobs:
   build:
+    if: ${{env.BUILD=="true"}}
     steps:
       - name: Checkout code
         uses: cloudbees-io/checkout@v1
