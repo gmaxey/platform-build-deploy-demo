@@ -92,6 +92,8 @@ jobs:
         run: kubectl create namespace qa
       - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: Deploy helm chart
+        kind: deploy
+        environment: qa
         run: helm install demo-app ./chart -f values.yaml
     needs:
-      - build
+      - deploy
