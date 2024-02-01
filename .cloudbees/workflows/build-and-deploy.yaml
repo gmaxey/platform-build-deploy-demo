@@ -7,10 +7,12 @@ on:
       - "**"
 env:
   APP_NAME: demo-app
-  BUILD: 'false'
+  BUILD: 'true'
   DEPLOY: 'true'
 jobs:
   build:
+    if: ${{env.BUILD}}
+
     steps:
       - name: Checkout code
         uses: cloudbees-io/checkout@v1
@@ -19,22 +21,18 @@ jobs:
         uses: docker://alpine/git:latest
         run: |
           git config --global --add safe.directory '*'
-        if: ${{env.BUILD}}
 
       - name: Install dependencies
         uses: docker://golang:1.20
         run: go mod download
-        if: ${{env.BUILD}}
 
       - name: Run tests
         uses: docker://golang:1.20
         run: go test -v ./...
-        if: ${{env.BUILD}}
 
       - name: Run build
         uses: docker://golang:1.20
         run: go build -v -buildvcs=false
-        if: ${{env.BUILD}}
 
       - name: Configure container registry credentials
         id: dockerconfig
@@ -53,7 +51,13 @@ jobs:
           destination: ${{ secrets.DOCKERHUB_USER }}/${{ env.APP_NAME }}:${{
             cloudbees.scm.sha }}
           labels: maintainer=Greg Maxey,version=${{ cloudbees.scm.sha }}
-        if: ${{env.BUILD}}
+
+    deploy:
+      needs: build
+      if: ${{env.DEPLOY}}
+      steps: 
+      - name: Checkout code
+        uses: cloudbees-io/checkout@v1
 
       - name: Add kubectl config file
         uses: docker://alpine:latest
@@ -84,19 +88,15 @@ jobs:
                   https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke
                 provideClusterInfo: true
           EOF
-        if: ${{env.DEPLOY}}
 
       - run: kubectl get namespaces
         name: test connection
         uses: docker://kiwigrid/gcloud-kubectl-helm:latest
-        if: ${{env.DEPLOY}}
 
       - run: kubectl create namespace qa
         name: Create target namespace
         uses: docker://kiwigrid/gcloud-kubectl-helm:latest
-        if: ${{env.DEPLOY}}
         
       - run: helm install demo-app ./chart -f values.yaml
         name: Deploy helm chart
         uses: docker://kiwigrid/gcloud-kubectl-helm:latest
-        if: ${{env.DEPLOY}}
