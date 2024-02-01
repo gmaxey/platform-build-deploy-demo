@@ -7,7 +7,7 @@ on:
       - "**"
 env:
   APP_NAME: demo-app
-  BUILD: "true"
+  BUILD: "false"
   DEPLOY: "true"
 jobs:
   build:
