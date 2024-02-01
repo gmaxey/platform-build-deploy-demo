@@ -43,6 +43,7 @@ jobs:
             cloudbees.scm.sha }}
           labels: maintainer=Greg Maxey,version=${{ cloudbees.scm.sha }}
   deploy:
+    environment: qa
     steps:
       - uses: cloudbees-io/checkout@v1
         name: Checkout code
@@ -93,7 +94,6 @@ jobs:
       - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: Deploy helm chart
         kind: deploy
-        environment: qa
         run: helm install demo-app ./chart -f values.yaml
     needs:
       - deploy
