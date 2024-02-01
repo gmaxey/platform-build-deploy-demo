@@ -5,12 +5,10 @@ on:
   push:
     branches:
       - "**"
-
 env:
   APP_NAME: demo-app
   BUILD: "true"
   DEPLOY: "true"
-
 jobs:
   build:
     steps:
@@ -36,7 +34,6 @@ jobs:
           registry: ${{ vars.DOCKER_REGISTRY }}
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Build and push container
         uses: cloudbees-io/kaniko@v1
         with:
@@ -45,57 +42,56 @@ jobs:
           destination: ${{ secrets.DOCKERHUB_USER }}/${{ env.APP_NAME }}:${{
             cloudbees.scm.sha }}
           labels: maintainer=Greg Maxey,version=${{ cloudbees.scm.sha }}
+  deploy:
+    steps:
+      - uses: cloudbees-io/checkout@v1
+        name: Checkout code
+      - uses: docker://alpine:latest
+        name: Add kubectl config file
+        run: >
+          rm -rf ${HOME}/.kube
 
-    deploy:
-      needs:
+          mkdir ${HOME}/.kube && cat >> ${HOME}/.kube/config << EOF
+
+          apiVersion: v1
+
+          clusters:
+
+          - cluster:
+              certificate-authority-data: ${{ secrets.CLUSTER_CERT }}
+              server: ${{ secrets.CLUSTER_SERVER }}
+            name: ${{ secrets.CLUSTER_NAME }}
+          contexts:
+
+          - context:
+              cluster: ${{ secrets.CLUSTER_NAME }}
+              user: ${{ secrets.CLUSTER_NAME }}
+            name: ${{ secrets.CLUSTER_NAME }}
+          current-context: ${{ secrets.CLUSTER_NAME }}
+
+          kind: Config
+
+          preferences: {}
+
+          users:
+
+          - name: ${{ secrets.CLUSTER_NAME }}
+            user:
+              exec:
+                apiVersion: client.authentication.k8s.io/v1beta1
+                command: gke-gcloud-auth-plugin
+                installHint: Install gke-gcloud-auth-plugin for use with kubectl by following
+                  https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke
+                provideClusterInfo: true
+          EOF
+      - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
+        name: test connection
+        run: kubectl get namespaces
+      - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
+        name: Create target namespace
+        run: kubectl create namespace qa
+      - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
+        name: Deploy helm chart
+        run: helm install demo-app ./chart -f values.yaml
+    needs:
       - build
-      steps:
-        - name: Checkout code
-          uses: cloudbees-io/checkout@v1
-        - name: Add kubectl config file
-          uses: docker://alpine:latest
-          run: >
-            rm -rf ${HOME}/.kube
-
-            mkdir ${HOME}/.kube && cat >> ${HOME}/.kube/config << EOF
-
-            apiVersion: v1
-
-            clusters:
-
-            - cluster:
-                certificate-authority-data: ${{ secrets.CLUSTER_CERT }}
-                server: ${{ secrets.CLUSTER_SERVER }}
-              name: ${{ secrets.CLUSTER_NAME }}
-            contexts:
-
-            - context:
-                cluster: ${{ secrets.CLUSTER_NAME }}
-                user: ${{ secrets.CLUSTER_NAME }}
-              name: ${{ secrets.CLUSTER_NAME }}
-            current-context: ${{ secrets.CLUSTER_NAME }}
-
-            kind: Config
-
-            preferences: {}
-
-            users:
-
-            - name: ${{ secrets.CLUSTER_NAME }}
-              user:
-                exec:
-                  apiVersion: client.authentication.k8s.io/v1beta1
-                  command: gke-gcloud-auth-plugin
-                  installHint: Install gke-gcloud-auth-plugin for use with kubectl by following
-                    https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke
-                  provideClusterInfo: true
-            EOF
-        - run: kubectl get namespaces
-          name: test connection
-          uses: docker://kiwigrid/gcloud-kubectl-helm:latest
-        - run: kubectl create namespace qa
-          name: Create target namespace
-          uses: docker://kiwigrid/gcloud-kubectl-helm:latest
-        - run: helm install demo-app ./chart -f values.yaml
-          name: Deploy helm chart
-          uses: docker://kiwigrid/gcloud-kubectl-helm:latest
