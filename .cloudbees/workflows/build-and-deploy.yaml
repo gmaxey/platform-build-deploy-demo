@@ -11,7 +11,7 @@ env:
   DEPLOY: "true"
 jobs:
   build:
-    if: ${{env.BUILD == "true"}}
+    if: ${{env.BUILD == 'true'}}
     steps:
       - name: Checkout code
         uses: cloudbees-io/checkout@v1
@@ -44,7 +44,7 @@ jobs:
             cloudbees.scm.sha }}
           labels: maintainer=Greg Maxey,version=${{ cloudbees.scm.sha }}
   deploy:
-    if: ${{env.DEPLOY == "true"}}
+    if: ${{env.DEPLOY == 'true'}}
     environment: qa
     steps:
       - uses: cloudbees-io/checkout@v1
