@@ -51,7 +51,7 @@ jobs:
         name: Checkout code
       - uses: docker://alpine:latest
         name: Add kubectl config.json file
-        run: >
+        run: |
           rm -rf ${HOME}/.kube
           mkdir ${HOME}/.kube && cat >> ${HOME}/.kube/config.json << EOF
           ${{ secrets.mlcbMultilinePass }}
