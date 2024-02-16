@@ -11,7 +11,7 @@ env:
   DEPLOY: "true"
 jobs:
   build:
-    #if: ${{env.BUILD}}
+    if: ${{env.BUILD == "true"}}
     steps:
       - name: Checkout code
         uses: cloudbees-io/checkout@v1
@@ -44,49 +44,28 @@ jobs:
             cloudbees.scm.sha }}
           labels: maintainer=Greg Maxey,version=${{ cloudbees.scm.sha }}
   deploy:
-    #if: ${{env.DEPLOY}}
+    if: ${{env.DEPLOY == "true"}}
     environment: qa
     steps:
       - uses: cloudbees-io/checkout@v1
         name: Checkout code
       - uses: docker://alpine:latest
-        name: Add kubectl config file
+        name: Add kubectl config.json file
         run: >
           rm -rf ${HOME}/.kube
-
-          mkdir ${HOME}/.kube && cat >> ${HOME}/.kube/config << EOF
-
-          apiVersion: v1
-
-          clusters:
-
-          - cluster:
-              certificate-authority-data: ${{ secrets.CLUSTER_CERT }}
-              server: ${{ secrets.CLUSTER_SERVER }}
-            name: ${{ secrets.CLUSTER_NAME }}
-          contexts:
-
-          - context:
-              cluster: ${{ secrets.CLUSTER_NAME }}
-              user: ${{ secrets.CLUSTER_NAME }}
-            name: ${{ secrets.CLUSTER_NAME }}
-          current-context: ${{ secrets.CLUSTER_NAME }}
-
-          kind: Config
-
-          preferences: {}
-
-          users:
-
-          - name: ${{ secrets.CLUSTER_NAME }}
-            user:
-              exec:
-                apiVersion: client.authentication.k8s.io/v1beta1
-                command: gke-gcloud-auth-plugin
-                installHint: Install gke-gcloud-auth-plugin for use with kubectl by following
-                  https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke
-                provideClusterInfo: true
+          mkdir ${HOME}/.kube && cat >> ${HOME}/.kube/config.json << EOF
+          ${{ secrets.mlcbMultilinePass }}
           EOF
+      - name: Google Cloud authentication and deployment
+        uses: docker://kiwigrid/gcloud-kubectl-helm:latest
+        run: |
+          gcloud auth login --cred-file=${HOME}/.kube/config.json 
+          gcloud config set project mlcbplatformproject
+          gcloud container clusters get-credentials mlcb-platform-cluster-ap001 --region us-east1 --project mlcbplatformproject 
+          kubectl create deployment deployment-mlcb --image=us-docker.pkg.dev/google-samples/containers/gke/hello-app:1.0
+          kubectl expose deployment deployment-mlcb --type LoadBalancer --port 80 --target-port 8080
+          kubectl get pods
+          kubectl get service deployment-mlcb
       - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: test connection
         run: kubectl get namespaces
