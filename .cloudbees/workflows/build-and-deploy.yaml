@@ -63,13 +63,19 @@ jobs:
           gcloud config set project mlcbplatformproject
       - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: test connection
-        run: kubectl get namespaces
+        run: |
+          gcloud config set project mlcbplatformproject
+          kubectl get namespaces
       - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: Create target namespace
-        run: kubectl create namespace qa
+        run: |
+          gcloud config set project mlcbplatformproject
+          kubectl create namespace qa
       - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: Deploy helm chart
         kind: deploy
-        run: helm install demo-app ./chart -f values.yaml
+        run: |
+          gcloud config set project mlcbplatformproject
+          helm install demo-app ./chart -f values.yaml
     needs:
       - build
