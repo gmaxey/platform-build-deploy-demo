@@ -60,7 +60,8 @@ jobs:
         uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         run: |
           gcloud auth login --cred-file=${HOME}/.kube/config.json 
-          gcloud config set project mlcbplatformproject
+          kubectl get namespaces
+          #gcloud config set project mlcbplatformproject
       - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: test connection
         run: |
