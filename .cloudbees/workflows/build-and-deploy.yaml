@@ -49,10 +49,9 @@ jobs:
     steps:
       - uses: cloudbees-io/checkout@v1
         name: Checkout code
-      - uses: docker://alpine:latest
+      - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: Add kubectl config.json file
         run: |
-          export HOME=/home/gkh
           rm -rf ${HOME}/.kube
           mkdir ${HOME}/.kube && cat >> ${HOME}/.kube/config.json << EOF
           ${{ secrets.mlcbMultilinePass }}
