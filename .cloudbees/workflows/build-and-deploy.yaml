@@ -65,13 +65,9 @@ jobs:
         run: |
           kubectl get namespaces
       - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
-        name: Create target namespace
-        run: |
-          kubectl create namespace qa
-      - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: Deploy helm chart
         kind: deploy
         run: |
-          helm install demo-app ./chart -f values.yaml
+          helm install demo-app ./chart -f values.yaml --create-namespace
     needs:
       - build
