@@ -68,6 +68,6 @@ jobs:
         name: Deploy helm chart
         kind: deploy
         run: |
-          helm install demo-app ./chart -f values.yaml --create-namespace
+          helm upgrade demo-app ./chart -f values.yaml --create-namespace
     needs:
       - build
