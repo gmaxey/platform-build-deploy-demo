@@ -49,16 +49,16 @@ jobs:
     steps:
       - uses: cloudbees-io/checkout@v1
         name: Checkout code
-      - uses: docker://alpine:latest
+      - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: Add kubectl config.json file
         run: |
-          $CLOUDBEES_WORKSPACE/gconfig.json << EOF
+          gconfig.json << EOF
           ${{ secrets.mlcbMultilinePass }}
           EOF
       - name: Google Cloud authentication
         uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         run: |
-          gcloud auth login --cred-file=$CLOUDBEES_WORKSPACE/gconfig.json 
+          gcloud auth login --cred-file=gconfig.json 
           gcloud container clusters get-credentials mlcb-platform-cluster-ap002 --region us-east1 --project mlcbplatformproject
       - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: test connection
