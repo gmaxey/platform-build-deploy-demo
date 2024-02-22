@@ -56,27 +56,23 @@ jobs:
           mkdir ${HOME}/.kube && cat >> ${HOME}/.kube/config.json << EOF
           ${{ secrets.mlcbMultilinePass }}
           EOF
-      - name: Google Cloud authentication and deployment
+      - name: Google Cloud authentication
         uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         run: |
           gcloud auth login --cred-file=${HOME}/.kube/config.json 
-          kubectl get namespaces
-          #gcloud config set project mlcbplatformproject
+          gcloud container clusters get-credentials mlcb-platform-cluster-ap002 --region us-east1 --project mlcbplatformproject
       - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: test connection
         run: |
-          gcloud config set project mlcbplatformproject
           kubectl get namespaces
       - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: Create target namespace
         run: |
-          gcloud config set project mlcbplatformproject
           kubectl create namespace qa
       - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: Deploy helm chart
         kind: deploy
         run: |
-          gcloud config set project mlcbplatformproject
           helm install demo-app ./chart -f values.yaml
     needs:
       - build
