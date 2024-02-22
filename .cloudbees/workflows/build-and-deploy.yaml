@@ -49,10 +49,10 @@ jobs:
     steps:
       - uses: cloudbees-io/checkout@v1
         name: Checkout code
-      - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
+      - uses: docker://alpine:latest
         name: Add kubectl config.json file
         run: |
-          gconfig.json << EOF
+          cat >> gconfig.json << EOF
           ${{ secrets.mlcbMultilinePass }}
           EOF
       - name: Google Cloud authentication
