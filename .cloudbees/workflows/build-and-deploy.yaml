@@ -11,7 +11,9 @@ env:
   DEPLOY: "true"
 jobs:
   build:
-    if: "false"
+    if: "true"
+    outputs:
+      image: ${{ steps.get-image.outputs.demo-app-image }}
     steps:
       - name: Checkout code
         uses: cloudbees-io/checkout@v1
@@ -27,26 +29,23 @@ jobs:
         run: go test -v ./...
       - name: Run build
         uses: docker://golang:1.20
-        run: go build -v -buildvcs=false
-      - name: Configure container registry credentials
-        id: dockerconfig
-        uses: cloudbees-io/configure-oci-credentials@v1
-        with:
-          registry: ${{ vars.DOCKER_REGISTRY }}
-          username: ${{ secrets.DOCKERHUB_USER }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push container
-        uses: cloudbees-io/kaniko@v1
-        with:
-          dockerfile: Dockerfile
-          context: .
-          destination: ${{ secrets.DOCKERHUB_USER }}/${{ env.APP_NAME }}:${{
-            cloudbees.scm.sha }}
-          labels: maintainer=Greg Maxey,version=${{ cloudbees.scm.sha }}
+        run: |
+          go build -v -buildvcs=false
+          ls
+          docker image ls
+      - id: get-image
+        uses: docker://golang:1.20
+        run: echo "put image here" >> "$CLOUDBEES_OUTPUT/demo-app-image"
+      
   deploy:
     if: "true"
     environment: qa
     steps:
+      - uses: docker://alpine:latest
+        name: Get image file
+        run: |
+          echo ${{needs.build.outputs.demo-app-image}} > demo-app-image
+          file demo-app-image
       - uses: cloudbees-io/checkout@v1
         name: Checkout code
       - uses: docker://alpine:latest
