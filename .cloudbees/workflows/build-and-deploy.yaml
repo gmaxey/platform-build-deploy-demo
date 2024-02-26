@@ -44,7 +44,7 @@ jobs:
       - uses: docker://alpine:latest
         name: Get image file
         run: |
-          echo ${{needs.build.outputs.demo-app-image}} > demo-app-image
+          echo ${{needs.build.outputs.image}} > demo-app-image
           file demo-app-image
       - uses: cloudbees-io/checkout@v1
         name: Checkout code
