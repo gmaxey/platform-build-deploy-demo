@@ -41,7 +41,7 @@ jobs:
           dockerfile: Dockerfile
           context: .
           destination: ${{ secrets.DOCKERHUB_USER }}/${{ env.APP_NAME }}:${{
-            cloudbees.scm.sha }}
+            cloudbees.scm.sha }},${{ secrets.DOCKERHUB_USER }}/${{ env.APP_NAME }}:latest
           labels: maintainer=Greg Maxey,version=${{ cloudbees.scm.sha }}
   deploy:
     if: "true"
