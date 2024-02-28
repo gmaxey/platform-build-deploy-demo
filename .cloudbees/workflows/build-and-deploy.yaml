@@ -67,9 +67,11 @@ jobs:
         name: Deploy helm chart
         kind: deploy
         run: |
-          #helm upgrade --set image.tag=${{needs.build.outputs.image-tag}} demo-app ./chart -f values.yaml --create-namespace
-          helm upgrade demo-app ./chart -f values.yaml --create-namespace
+          helm upgrade demo-app ./chart -f values.yaml
+      - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
+        name: Instructions
+        run: |
           echo "kubectl port-forward svc/demo-app 8080:80"
-          echo "http://localhost:8080"
+          echo "http://localhost:8080"             
     needs:
       - build
