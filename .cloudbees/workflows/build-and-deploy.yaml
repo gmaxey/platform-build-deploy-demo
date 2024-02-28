@@ -71,7 +71,7 @@ jobs:
       - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: Instructions
         run: |
-          echo "kubectl port-forward svc/demo-app 8080:80"
+          echo "kubectl port-forward svc/demo-app 8080:8080"
           echo "http://localhost:8080"             
     needs:
       - build
