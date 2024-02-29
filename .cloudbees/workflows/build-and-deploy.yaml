@@ -41,7 +41,7 @@ jobs:
           dockerfile: Dockerfile
           context: .
           destination: ${{ secrets.DOCKERHUB_USER }}/${{ env.APP_NAME }}:${{
-            cloudbees.scm.sha }},${{ secrets.DOCKERHUB_USER }}/${{ env.APP_NAME }}:latest
+            cloudbees.scm.sha }}
           labels: maintainer=Greg Maxey,version=${{ cloudbees.scm.sha }}
   deploy:
     environment: Production
@@ -67,7 +67,7 @@ jobs:
         name: Deploy helm chart
         kind: deploy
         run: |
-          helm upgrade -i demo-app ./chart -f values.yaml
+          helm upgrade -i demo-app ./chart -f values.yaml --set image.tag=${{needs.build.outputs.image-tag}}
       - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: Instructions
         run: |
