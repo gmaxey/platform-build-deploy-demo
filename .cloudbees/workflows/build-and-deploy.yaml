@@ -67,7 +67,7 @@ jobs:
         name: Deploy helm chart
         kind: deploy
         run: |
-          helm install demo-app ./chart -f values.yaml
+          helm upgrade -i demo-app ./chart -f values.yaml
       - uses: docker://kiwigrid/gcloud-kubectl-helm:latest
         name: Instructions
         run: |
