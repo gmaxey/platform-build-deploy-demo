@@ -2,10 +2,7 @@ apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: Build and deploy demo-app
 on:
-  push:
-    branches:
-      - "**"
-      - main
+  workflow_dispatch:
 env:
   APP_NAME: demo-app
 jobs:
@@ -44,7 +41,7 @@ jobs:
             cloudbees.scm.sha }}
           labels: maintainer=Greg Maxey,version=${{ cloudbees.scm.sha }}
   deploy:
-    environment: Production
+    environment: gpm-prod
     steps:
       - uses: cloudbees-io/checkout@v1
         name: Checkout code
